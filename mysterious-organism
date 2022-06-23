@@ -1,0 +1,93 @@
+// Returns a random DNA base
+const returnRandBase = () => {
+  const dnaBases = ["A", "T", "C", "G"];
+  return dnaBases[Math.floor(Math.random() * 4)];
+};
+
+// Returns a random single strand of DNA containing 15 bases
+const mockUpStrand = () => {
+  const newStrand = [];
+  for (let i = 0; i < 15; i++) {
+    newStrand.push(returnRandBase());
+  }
+  return newStrand;
+};
+
+const pAequorFactory = (num, arr) => {
+  return {
+    specimenNum: num,
+    dna: arr,
+    // method to mutate a given dna by replacing a dna base with a random base that is not matching the original base
+    mutate() {
+      const randomIndex = Math.floor(Math.random() * 15);
+      const currentBase = this.dna[randomIndex];
+      let newBase = currentBase;
+      while (newBase == currentBase) {
+        newBase = returnRandBase();
+      }
+      this.dna[randomIndex] = newBase;
+      return this.dna;
+    },
+    //method to compare two dna's of the specimen and establish the matching %
+    compareDNA(b) {
+      const aArray = this.dna;
+      const bArray = b.dna;
+      const DNAMatch = () => {
+        let matches = [];
+        for (let e = 0; e < aArray.length; e++) {
+          if (aArray[e] === bArray[e]) {
+            matches.push(aArray[e]);
+          }
+        }
+        return (matches.length / this.dna.length) * 100;
+      };
+      return (
+        "specimen #1 and specimen #2 have " +
+        DNAMatch().toFixed(2) +
+        "% DNA in common"
+      );
+    },
+    //method that verifies if the specimen has a chance of survival by checking that the 'G' and 'C' bases contained in the dna are over 60%
+    willLikelySurvive() {
+      let arr = [];
+      for (let i = 0; i < this.dna.length; i++) {
+        if (this.dna[i] === "C" || this.dna[i] === "G") {
+          arr.push(this.dna[i]);
+        }
+      }
+      let matchingPercent = (arr.length / this.dna.length) * 100;
+      return matchingPercent >= 60;
+    },
+    //create a new strand with switched bases
+    complementStrand() {
+      let newStrand = [];
+      for (let key in this.dna){
+       switch (this.dna[key]){
+         case 'A':
+         newStrand.push('T');
+         break;
+         case 'T':
+         newStrand.push('A');
+         break;
+         case 'C':
+         newStrand.push('G');
+         break;
+         case 'G':
+         newStrand.push('C');
+         break;
+       } 
+      }
+      console.log(this.dna)
+      console.log(newStrand);
+    }
+  };
+};
+//create 30 strands that will be likely to survive
+let arrSurvived = [];
+while (arrSurvived.length < 30) {
+  const pAequor = pAequorFactory(arrSurvived.length, mockUpStrand()); 
+  if (pAequor.willLikelySurvive()) {
+    arrSurvived.push(pAequor);
+  }
+}
+
